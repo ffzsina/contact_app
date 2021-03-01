@@ -1,19 +1,13 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 
-export function ContactList(){
-    const [contacts, setContacts] = useState([]);
-
-    useEffect(() => {
-        axios.get(`http://localhost:8080/api/tasks`)
-        .then(res => setContacts(res.data));
-    }, []);
+export function ContactList(props){
 
     return (
         <div className="border p-2 m-2">
             <h2>Contacts</h2>
             <ul className="list-group">
-                {contacts.map(contact =>
+                {props.contacts.map(contact =>
                     <li key={contact.id} className="list-group-item">
                         <div>
                             {contact.name.firstName} {contact.name.lastName} <span className="small">({contact.id})</span>
@@ -48,10 +42,12 @@ export function ContactList(){
     );
 }
 
-export function AddContact(){
+export function AddContact(props){
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [address, setAddress] = useState("");
+    const [emailIds, setEmailIds] = useState([]);
+    const [phoneIds, setPhoneIds] = useState([]);
 
     const handleChangeFirst = event => {
         setFirstName(event.target.value);
@@ -71,41 +67,117 @@ export function AddContact(){
                 firstName: firstName,
                 lastName: lastName
             },
-            phones: [
-                {
-                    type: "private",
-                    number: "121315"
-                },
-                {
-                    type: "office",
-                    number: "78999"
-                }
-            ],
-            webs: ["valami.io","www.mysite.com", "egyeb.hu"],
+            phones: preparePhones(event.target.elements),
+            webs: prepareEmails(event.target.elements),
             address: address
         }
-
-       axios.post('http://localhost:8080/api/tasks', contact);
+        axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/contacts`, contact);
+        props.setChangeHappened(true);
     };
 
     return (
         <div className="border p-2 m-2">
             <h2>New contact</h2>
             <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label>Contact First Name:</label>
-                    <input type="text" className="form-control" name="firstName" onChange={handleChangeFirst}/>
+                <div className="form-row">
+                    <div className="form-group col">
+                        <label>First name:</label>
+                        <input type="text" className="form-control" name="firstName" placeholder="John" onChange={handleChangeFirst}/>
+                    </div>
+                    <div className="form-group col">
+                        <label>Last name:</label>
+                        <input type="text" className="form-control" name="lastName" placeholder="Doe" onChange={handleChangeLast}/>
+                    </div>
                 </div>
-                <div className="form-group">
-                    <label>Contact Last Name:</label>
-                    <input type="text" className="form-control" name="lastName" onChange={handleChangeLast}/>
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>Phones:</label>
+                        {phoneIds.map((phoneId, i) => (
+                            <div key={phoneId} className="row m-2">
+                                <select className="form-control col-3" name={"phone-type-" + i}>
+                                    <option value="private">Private</option>
+                                    <option value="office">Office</option>
+                                </select>
+                                <div className="col-6">
+                                    <input type="text" name={"phone-number-" + i}
+                                        className="form-control" placeholder="0670/..." required
+                                    />
+                                </div>
+                                <div className="col-3">
+                                    <button className="btn btn-danger btn-sm" type="button"
+                                        onClick={() => {
+                                            setPhoneIds((prevIds) => {
+                                                const ret = [...prevIds];
+                                                ret.splice(i, 1);
+                                                return ret;
+                                                });
+                                            }
+                                        }
+                                    >
+                                        Trash
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                        <div className="row">
+                            <div className="col-3 offset-9">
+                                <button type="button" className="btn btn-success btn-sm"
+                                    onClick={() => {
+                                        setPhoneIds((prev) => [...prev, uuidv4()]);
+                                    }}
+                                >
+                                    Plus
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="form-group">
-                    <label>Contact Address:</label>
-                    <input type="text" className="form-control" name="address" onChange={handleChangeAddress}/>
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>E-mails:</label>
+                        {emailIds.map((emailId, i) => (
+                            <div key={emailId} className="row m-2">
+                                <div className="col-9">
+                                    <input type="text" name={"web-" + i}
+                                        className="form-control" placeholder="e-mail or website" required
+                                    />
+                                </div>
+                                <div className="col-3">
+                                    <button className="btn btn-danger btn-sm" type="button"
+                                        onClick={() => {
+                                            setEmailIds((prevIds) => {
+                                                const ret = [...prevIds];
+                                                ret.splice(i, 1);
+                                                return ret;
+                                                });
+                                            }
+                                        }
+                                    >
+                                        Trash
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                        <div className="row">
+                            <div className="col-3 offset-9">
+                                <button type="button" className="btn btn-success btn-sm"
+                                    onClick={() => {
+                                        setEmailIds((prev) => [...prev, uuidv4()]);
+                                    }}
+                                >
+                                    Plus
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="form-row">
+                    <label>Address:</label>
+                    <input type="text" className="form-control" name="address" placeholder="address" onChange={handleChangeAddress}/>
                 </div>
                 <button type="submit" className="btn btn-primary">Add</button>
-                
             </form>
         </div>
     );
@@ -120,7 +192,7 @@ export function DeleteContact(){
 
     const handleSubmit = event => {
         event.preventDefault();
-        fetch(`http://localhost:8080/api/tasks/${id}`, {
+        fetch(`${process.env.REACT_APP_BACKEND_URL}/api/contacts/${id}`, {
             method: "DELETE"
         });
     };
@@ -131,5 +203,53 @@ export function DeleteContact(){
             <input type="text" name="id" onChange={handleChange}/>
             <button type="submit">Delete</button>
         </form>
+    );
+}
+
+//stackoverflow
+function uuidv4() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 16) | 0,
+        v = c == "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+}
+
+function prepareEmails(elements) {
+    return Object.values(
+        Object.entries(elements)
+        .filter(([key, value]) => {
+            if (value.name){ 
+                const [dataType] = value.name.split("-");
+                return dataType === "web";
+            } else {return false;}
+        })
+        .map(([key, value]) => (
+            value.value
+        ))
+    );
+}
+
+function preparePhones(elements) {
+    return Object.values(
+        Object.entries(elements)
+        .filter(([key, value]) => {
+            if (value.name){ 
+                const [dataType] = value.name.split("-");
+                return dataType === "phone";
+            } else {return false;}
+        })
+        .reduce((acc, [key, value]) => {
+            const [_, name, index] = value.name.split("-");
+            return {
+              ...acc,
+              [index]: acc[index]
+                ? {
+                    ...acc[index],
+                    [name]: value.value,
+                  }
+                : { [name]: value.value },
+            };
+          }, {})
     );
 }
