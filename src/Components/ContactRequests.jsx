@@ -190,7 +190,7 @@ export function SingleContact(props){
                 }}
                 onClosed={() => setDeleting(false)}
             >
-            Biztosan törlöd a {props.selectedContact.name.firstName} kontaktját?
+            Are you sure you want to delete {props.selectedContact.name.firstName}'s contact card?
           </Modal>
             :
             ""
