@@ -1,40 +1,18 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, Fragment} from "react";
+import {Modal} from "./Modal";
 import axios from "axios";
 
 export function ContactList(props){
 
     return (
         <div className="border p-2 m-2">
-            <h2>Contacts</h2>
+            <h3>Contacts</h3>
             <ul className="list-group">
                 {props.contacts.map(contact =>
-                    <li key={contact.id} className="list-group-item">
-                        <div>
-                            {contact.name.firstName} {contact.name.lastName} <span className="small">({contact.id})</span>
-                        </div>
-                        <div>
-                            phones:
-                            <ul className="list-group">
-                                {contact.phones.map((phone, i) =>
-                                    <li key={i} className="list-group-item">
-                                        {phone.number} <span className="small">({phone.type})</span>
-                                    </li>
-                                )}
-                            </ul>
-                        </div>
-                        <div>
-                            webs:
-                            <ul className="list-group">
-                                {contact.webs.map((web, i) =>
-                                    <li key={i} className="list-group-item">
-                                        {web}
-                                    </li>
-                                )}
-                            </ul>
-                        </div>
-                        <div>
-                            address: {contact.address}
-                        </div>
+                    <li key={contact.id} className={"list-group-item" + (contact===props.selectedContact ? " bg-dark text-white" : "")}
+                        style={{cursor: "pointer"}} onClick={() => {props.setSelectedContact(contact);}}
+                    >
+                            {contact.name.firstName} {contact.name.lastName}
                     </li>    
                 )}
             </ul>
@@ -59,7 +37,7 @@ export function AddContact(props){
         setAddress(event.target.value);
     }
 
-    const handleSubmit = event => {
+    const handleSubmit = async event => {
         event.preventDefault();
         const contact = {
             name :
@@ -71,25 +49,25 @@ export function AddContact(props){
             webs: prepareEmails(event.target.elements),
             address: address
         }
-        axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/contacts`, contact);
+        await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/contacts`, contact);
         props.setChangeHappened(true);
+        props.setCreating(false);
     };
 
     return (
         <div className="border p-2 m-2">
-            <h2>New contact</h2>
+            <h3>New contact</h3>
             <form onSubmit={handleSubmit}>
                 <div className="form-row">
                     <div className="form-group col">
                         <label>First name:</label>
-                        <input type="text" className="form-control" name="firstName" placeholder="John" onChange={handleChangeFirst}/>
+                        <input type="text" className="form-control" name="firstName" placeholder="John" onChange={handleChangeFirst} required/>
                     </div>
                     <div className="form-group col">
                         <label>Last name:</label>
-                        <input type="text" className="form-control" name="lastName" placeholder="Doe" onChange={handleChangeLast}/>
+                        <input type="text" className="form-control" name="lastName" placeholder="Doe" onChange={handleChangeLast} required/>
                     </div>
                 </div>
-
                 <div className="form-row">
                     <div className="form-group">
                         <label>Phones:</label>
@@ -178,31 +156,89 @@ export function AddContact(props){
                     <input type="text" className="form-control" name="address" placeholder="address" onChange={handleChangeAddress}/>
                 </div>
                 <button type="submit" className="btn btn-primary">Add</button>
+                <button type="button" className="btn btn-danger" onClick={() => {props.setCreating(false);}}>X</button>
             </form>
         </div>
     );
 }
 
-export function DeleteContact(){
-    const [id, setId] = useState(0);
 
-    const handleChange = event => {
-        setId(event.target.value);
+export function SingleContact(props){
+
+    const [deleting, setDeleting] = useState(false);
+
+    if (!props.selectedContact){
+        return (
+            <div className="border p-2 m-2">
+                <h3>Selected Contact</h3>
+                <h5>not chosen yet</h5>
+            </div>
+        );
     }
 
-    const handleSubmit = event => {
-        event.preventDefault();
-        fetch(`${process.env.REACT_APP_BACKEND_URL}/api/contacts/${id}`, {
-            method: "DELETE"
-        });
-    };
-
     return (
-        <form onSubmit={handleSubmit}>
-            <label>Contact ID:</label>
-            <input type="text" name="id" onChange={handleChange}/>
-            <button type="submit">Delete</button>
-        </form>
+        <Fragment>
+            {deleting ?
+            <Modal
+                onApproved={async event => {
+                    event.preventDefault();
+                    await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/contacts/${props.selectedContact.id}`);
+                    props.setChangeHappened(true);
+                    props.setCreating(false);
+                    props.setSelectedContact();
+                    setDeleting(false);
+                }}
+                onClosed={() => setDeleting(false)}
+            >
+            Biztosan törlöd a {props.selectedContact.name.firstName} kontaktját?
+          </Modal>
+            :
+            ""
+            }
+            <div className="border p-2 m-2">
+                <h3>Selected Contact</h3>
+                <h1 className="bg-dark text-white text-center">
+                    {props.selectedContact.name.firstName} {props.selectedContact.name.lastName}
+                </h1>
+                <p className="small">({props.selectedContact.id})</p>
+                <div className={(props.selectedContact.phones.length ? "" : "collapse")}>
+                    <h5>Phones</h5>
+                    <ul className="list-group">
+                        {props.selectedContact.phones.map((phone, i) =>
+                            <li key={i} className="list-group-item">
+                                {phone.number} <span className="small">({phone.type})</span>
+                            </li>
+                        )}
+                    </ul>
+                </div>
+                <div className={(props.selectedContact.webs.length ? "" : "collapse")}>
+                    <h5>Webs &amp; emails</h5>
+                    <ul className="list-group">
+                        {props.selectedContact.webs.map((web, i) =>
+                            <li key={i} className="list-group-item">
+                                {web}
+                            </li>
+                        )}
+                    </ul>
+                </div>
+                <div className={(props.selectedContact.address ? "" : "collapse")}>
+                    <h5>Address</h5>
+                    <div className="list-group">
+                        <div className="list-group-item">
+                            {props.selectedContact.address}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="border p-2 m-2">
+                <button onClick={() => {setDeleting(true);}}>
+                    Trash
+                </button>
+                <button>
+                    (Pencil)
+                </button>
+            </div>
+        </Fragment>
     );
 }
 
