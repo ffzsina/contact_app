@@ -1,5 +1,6 @@
 import {BrowserRouter, Redirect, Route, Switch} from "react-router-dom";
 import {MainPage} from "./Components/MainPage";
+import './responsive.css';
 
 function App() {
   return (

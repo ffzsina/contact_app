@@ -1,22 +1,54 @@
 import {useEffect, useState, Fragment} from "react";
 import {Modal} from "./Modal";
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faArrowRight, faArrowUp, faArrowDown} from "@fortawesome/free-solid-svg-icons";
 
 export function ContactList(props){
 
     return (
-        <div className="border p-2 m-2">
+        <Fragment>
+        <div id="VerticalContactList" className="border shadow p-3 mb-4 mt-4 rounded">
             <h3>Contacts</h3>
-            <ul className="list-group">
+            <ul className="list-group" id="ContactList">
+                <li className="list-group-item bg-secondary text-white text-center mb-1"
+                    style={{cursor: "pointer"}}>
+                    <FontAwesomeIcon icon={faArrowUp}/>
+                </li>
                 {props.contacts.map(contact =>
-                    <li key={contact.id} className={"list-group-item" + (contact===props.selectedContact ? " bg-dark text-white" : "")}
+                    <li key={contact.id} className={"list-group-item border" + (contact===props.selectedContact ? " bg-dark text-white" : "")}
                         style={{cursor: "pointer"}} onClick={() => {props.setSelectedContact(contact);}}
                     >
                             {contact.name.firstName} {contact.name.lastName}
                     </li>    
                 )}
+                <li className="list-group-item bg-secondary text-white text-center mt-1"
+                    style={{cursor: "pointer"}}>
+                    <FontAwesomeIcon icon={faArrowDown}/>
+                </li>
             </ul>
         </div>
+        <div id="HorizontalContactList" className="border shadow p-3 mb-4 mt-4 rounded">
+            <h3>Contacts</h3>
+            <div className="row">
+                <Fragment>
+                    <button className="btn btn-sm btn-secondary mr-1 ml-3">
+                        <FontAwesomeIcon icon={faArrowLeft}/>
+                    </button>
+                    {props.contacts.map(contact =>
+                        <div key={contact.id} className={"col border rounded text-center" + (contact===props.selectedContact ? " bg-dark text-white" : "")}
+                            style={{cursor: "pointer"}} onClick={() => {props.setSelectedContact(contact);}}
+                        >
+                                {contact.name.firstName[0]}. {contact.name.lastName[0]}.
+                        </div>    
+                    )}
+                    <button className="btn btn-sm btn-secondary ml-1 mr-3">
+                        <FontAwesomeIcon icon={faArrowRight}/>
+                    </button>
+                </Fragment>
+            </div>
+        </div>
+        </Fragment>
     );
 }
 
@@ -55,9 +87,9 @@ export function AddContact(props){
     };
 
     return (
-        <div className="border p-2 m-2">
-            <h3>New contact</h3>
-            <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
+            <div id="WithBackgroundImage" className="border shadow p-3 mb-4 mt-4 rounded">
+                <h3>New contact</h3>
                 <div className="form-row">
                     <div className="form-group col">
                         <label>First name:</label>
@@ -100,7 +132,7 @@ export function AddContact(props){
                         ))}
                         <div className="row">
                             <div className="col-3 offset-9">
-                                <button type="button" className="btn btn-success btn-sm"
+                                <button type="button" className="btn btn-secondary btn-sm"
                                     onClick={() => {
                                         setPhoneIds((prev) => [...prev, uuidv4()]);
                                     }}
@@ -111,7 +143,6 @@ export function AddContact(props){
                         </div>
                     </div>
                 </div>
-
                 <div className="form-row">
                     <div className="form-group">
                         <label>E-mails:</label>
@@ -140,7 +171,7 @@ export function AddContact(props){
                         ))}
                         <div className="row">
                             <div className="col-3 offset-9">
-                                <button type="button" className="btn btn-success btn-sm"
+                                <button type="button" className="btn btn-secondary btn-sm"
                                     onClick={() => {
                                         setEmailIds((prev) => [...prev, uuidv4()]);
                                     }}
@@ -155,10 +186,12 @@ export function AddContact(props){
                     <label>Address:</label>
                     <input type="text" className="form-control" name="address" placeholder="address" onChange={handleChangeAddress}/>
                 </div>
-                <button type="submit" className="btn btn-primary">Add</button>
+            </div>
+            <div className="d-flex justify-content-center border shadow-sm p-3 mb-4 mt-4 rounded bg-light">
+                <button type="submit" className="btn btn-dark mr-2">Add</button>
                 <button type="button" className="btn btn-danger" onClick={() => {props.setCreating(false);}}>X</button>
-            </form>
-        </div>
+            </div>
+        </form>
     );
 }
 
@@ -169,7 +202,7 @@ export function SingleContact(props){
 
     if (!props.selectedContact){
         return (
-            <div className="border p-2 m-2">
+            <div id="WithBackgroundImage" className="border shadow p-3 mb-4 mt-4 rounded">
                 <h3>Selected Contact</h3>
                 <h5>not chosen yet</h5>
             </div>
@@ -195,7 +228,7 @@ export function SingleContact(props){
             :
             ""
             }
-            <div className="border p-2 m-2">
+            <div id="WithBackgroundImage" className="border shadow p-3 mb-4 mt-4 rounded">
                 <h3>Selected Contact</h3>
                 <h1 className="bg-dark text-white text-center">
                     {props.selectedContact.name.firstName} {props.selectedContact.name.lastName}
@@ -230,11 +263,11 @@ export function SingleContact(props){
                     </div>
                 </div>
             </div>
-            <div className="border p-2 m-2">
-                <button onClick={() => {setDeleting(true);}}>
+            <div className="d-flex justify-content-center border shadow-sm p-3 mb-4 mt-4 rounded bg-light">
+                <button className="btn btn-danger mr-2" onClick={() => {setDeleting(true);}}>
                     Trash
                 </button>
-                <button>
+                <button className="btn btn-dark">
                     (Pencil)
                 </button>
             </div>

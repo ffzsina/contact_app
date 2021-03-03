@@ -1,0 +1,20 @@
+@media only screen and (max-width: 767px) {
+    #VerticalContactList {
+        display: none;
+    }
+}
+
+@media only screen and (min-width: 768px) {
+    #HorizontalContactList {
+        display: none;
+    }
+}
+
+img {
+    width: 100%;
+}
+
+#WithBackgroundImage {
+    background-image: url("http://localhost:8080/static/images/red_phone.jpg");
+    background-size: cover;
+}

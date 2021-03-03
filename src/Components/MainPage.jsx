@@ -23,7 +23,15 @@ export function MainPage() {
         <div className="container">
             {changeHappened}
             <div className="row">
-                <div className="col">
+                <div className="col-md">
+                    <ContactList contacts={contacts} setSelectedContact={setSelectedContact} selectedContact={selectedContact}/>
+                    <div className="d-flex justify-content-center border shadow-sm p-3 mb-4 mt-4 rounded bg-light">
+                        <button type="button" className="btn btn-dark" onClick={() => setCreating(true)}>
+                            Add a new contact
+                        </button>
+                    </div>
+                </div>
+                <div className="col-md">
                     {creating ?
                         <AddContact
                             setChangeHappened={setChangeHappened}
@@ -37,14 +45,6 @@ export function MainPage() {
                             setCreating={setCreating}
                         />
                     }
-                </div>
-                <div className="col">
-                    <ContactList contacts={contacts} setSelectedContact={setSelectedContact} selectedContact={selectedContact}/>
-                    <div className="d-flex justify-content-center">
-                        <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
-                            Add a new contact
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
