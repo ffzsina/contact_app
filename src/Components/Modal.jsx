@@ -1,6 +1,9 @@
 import React from "react";
+import {LangContext} from "../App";
 
 export function Modal({ onClosed, onApproved, children }) {
+    const langCntx = React.useContext(LangContext);
+
     return (
     <div className="modal d-block">
         <div className="modal-dialog">
@@ -16,10 +19,10 @@ export function Modal({ onClosed, onApproved, children }) {
                 </div>
                 <div className="modal-footer">
                     <button type="button" className="btn btn-secondary" onClick={onClosed}>
-                        Cancel
+                        {langCntx.dict[langCntx.langGetSet[0]].cancel}
                     </button>
                     <button type="button" className="btn btn-danger" onClick={onApproved}>
-                        Delete
+                        {langCntx.dict[langCntx.langGetSet[0]].delete}
                     </button>
                 </div>
             </div>

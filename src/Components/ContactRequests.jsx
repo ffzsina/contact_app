@@ -1,15 +1,17 @@
-import {useEffect, useState, Fragment} from "react";
+import React, {useState, Fragment} from "react";
 import {Modal} from "./Modal";
+import {LangContext} from "../App";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight, faArrowUp, faArrowDown} from "@fortawesome/free-solid-svg-icons";
 
 export function ContactList(props){
+    const langCntx = React.useContext(LangContext);
 
     return (
         <Fragment>
         <div id="VerticalContactList" className="border shadow p-3 mb-4 mt-4 rounded">
-            <h3>Contacts</h3>
+            <h3>{langCntx.dict[langCntx.langGetSet[0]].contacts}</h3>
             <ul className="list-group" id="ContactList">
                 <li className="list-group-item bg-secondary text-white text-center mb-1"
                     style={{cursor: "pointer"}}>
@@ -19,7 +21,11 @@ export function ContactList(props){
                     <li key={contact.id} className={"list-group-item border" + (contact===props.selectedContact ? " bg-dark text-white" : "")}
                         style={{cursor: "pointer"}} onClick={() => {props.setSelectedContact(contact);}}
                     >
-                            {contact.name.firstName} {contact.name.lastName}
+                        {langCntx.langGetSet[0]==="eng" ?
+                            <span>{contact.name.firstName} {contact.name.lastName}</span>
+                            :
+                            <span>{contact.name.lastName} {contact.name.firstName}</span>
+                        }
                     </li>    
                 )}
                 <li className="list-group-item bg-secondary text-white text-center mt-1"
@@ -29,7 +35,7 @@ export function ContactList(props){
             </ul>
         </div>
         <div id="HorizontalContactList" className="border shadow p-3 mb-4 mt-4 rounded">
-            <h3>Contacts</h3>
+            <h3>{langCntx.dict[langCntx.langGetSet[0]].contacts}</h3>
             <div className="row">
                 <Fragment>
                     <button className="btn btn-sm btn-secondary mr-1 ml-3">
@@ -39,7 +45,11 @@ export function ContactList(props){
                         <div key={contact.id} className={"col border rounded text-center" + (contact===props.selectedContact ? " bg-dark text-white" : "")}
                             style={{cursor: "pointer"}} onClick={() => {props.setSelectedContact(contact);}}
                         >
-                                {contact.name.firstName[0]}. {contact.name.lastName[0]}.
+                        {langCntx.langGetSet[0]==="eng" ?
+                            <span>{contact.name.firstName[0]}. {contact.name.lastName[0]}.</span>
+                            :
+                            <span>{contact.name.lastName[0]}. {contact.name.firstName[0]}.</span>
+                        }
                         </div>    
                     )}
                     <button className="btn btn-sm btn-secondary ml-1 mr-3">
@@ -52,7 +62,21 @@ export function ContactList(props){
     );
 }
 
+export function AddContactButton(props){
+    const langCntx = React.useContext(LangContext);
+
+    return(
+        <div className="d-flex justify-content-center border shadow-sm p-3 mb-4 mt-4 rounded bg-light">
+            <button type="button" className="btn btn-dark" onClick={() => props.setCreating(true)}>
+                {langCntx.dict[langCntx.langGetSet[0]].addANewContact}
+            </button>
+        </div>
+    );
+}
+
 export function AddContact(props){
+    const langCntx = React.useContext(LangContext);
+
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [address, setAddress] = useState("");
@@ -89,25 +113,31 @@ export function AddContact(props){
     return (
         <form onSubmit={handleSubmit}>
             <div id="WithBackgroundImage" className="border shadow p-3 mb-4 mt-4 rounded">
-                <h3>New contact</h3>
+                <h3>{langCntx.dict[langCntx.langGetSet[0]].newContact}</h3>
                 <div className="form-row">
                     <div className="form-group col">
-                        <label>First name:</label>
-                        <input type="text" className="form-control" name="firstName" placeholder="John" onChange={handleChangeFirst} required/>
+                        <label>{langCntx.dict[langCntx.langGetSet[0]].firstName}:</label>
+                        <input type="text" className="form-control" name="firstName"
+                            placeholder={langCntx.dict[langCntx.langGetSet[0]].firstNameExample}
+                            onChange={handleChangeFirst} required
+                        />
                     </div>
                     <div className="form-group col">
-                        <label>Last name:</label>
-                        <input type="text" className="form-control" name="lastName" placeholder="Doe" onChange={handleChangeLast} required/>
-                    </div>
+                        <label>{langCntx.dict[langCntx.langGetSet[0]].lastName}:</label>
+                        <input type="text" className="form-control" name="lastName"
+                            placeholder={langCntx.dict[langCntx.langGetSet[0]].lastNameExample}
+                            onChange={handleChangeLast} required
+                        />
+                    </div>            
                 </div>
                 <div className="form-row">
                     <div className="form-group">
-                        <label>Phones:</label>
+                        <label>{langCntx.dict[langCntx.langGetSet[0]].phones}:</label>
                         {phoneIds.map((phoneId, i) => (
                             <div key={phoneId} className="row m-2">
                                 <select className="form-control col-3" name={"phone-type-" + i}>
-                                    <option value="private">Private</option>
-                                    <option value="office">Office</option>
+                                    <option value="private">{langCntx.dict[langCntx.langGetSet[0]].private}</option>
+                                    <option value="office">{langCntx.dict[langCntx.langGetSet[0]].office}</option>
                                 </select>
                                 <div className="col-6">
                                     <input type="text" name={"phone-number-" + i}
@@ -145,7 +175,7 @@ export function AddContact(props){
                 </div>
                 <div className="form-row">
                     <div className="form-group">
-                        <label>E-mails:</label>
+                        <label>{langCntx.dict[langCntx.langGetSet[0]].emails}</label>
                         {emailIds.map((emailId, i) => (
                             <div key={emailId} className="row m-2">
                                 <div className="col-9">
@@ -183,13 +213,13 @@ export function AddContact(props){
                     </div>
                 </div>
                 <div className="form-row">
-                    <label>Address:</label>
+                    <label>{langCntx.dict[langCntx.langGetSet[0]].address}:</label>
                     <input type="text" className="form-control" name="address" placeholder="address" onChange={handleChangeAddress}/>
                 </div>
             </div>
             <div className="d-flex justify-content-center border shadow-sm p-3 mb-4 mt-4 rounded bg-light">
-                <button type="submit" className="btn btn-dark mr-2">Add</button>
-                <button type="button" className="btn btn-danger" onClick={() => {props.setCreating(false);}}>X</button>
+                <button type="submit" className="btn btn-dark mr-2">{langCntx.dict[langCntx.langGetSet[0]].add}</button>
+                <button type="button" className="btn btn-danger" onClick={() => {props.setCreating(false);}}>{langCntx.dict[langCntx.langGetSet[0]].cancel}</button>
             </div>
         </form>
     );
@@ -197,14 +227,15 @@ export function AddContact(props){
 
 
 export function SingleContact(props){
+    const langCntx = React.useContext(LangContext);
 
     const [deleting, setDeleting] = useState(false);
 
     if (!props.selectedContact){
         return (
             <div id="WithBackgroundImage" className="border shadow p-3 mb-4 mt-4 rounded">
-                <h3>Selected Contact</h3>
-                <h5>not chosen yet</h5>
+                <h3>{langCntx.dict[langCntx.langGetSet[0]].selectedContact}</h3>
+                <h5>{langCntx.dict[langCntx.langGetSet[0]].notChoosenYet}</h5>
             </div>
         );
     }
@@ -223,19 +254,22 @@ export function SingleContact(props){
                 }}
                 onClosed={() => setDeleting(false)}
             >
-            Are you sure you want to delete {props.selectedContact.name.firstName}'s contact card?
-          </Modal>
+                {langCntx.dict[langCntx.langGetSet[0]].deleteTextBegin} {props.selectedContact.name.firstName}{langCntx.dict[langCntx.langGetSet[0]].deleteTextEnd}
+            </Modal>
             :
             ""
             }
             <div id="WithBackgroundImage" className="border shadow p-3 mb-4 mt-4 rounded">
-                <h3>Selected Contact</h3>
+                <h3>{langCntx.dict[langCntx.langGetSet[0]].selectedContact}</h3>
                 <h1 className="bg-dark text-white text-center">
-                    {props.selectedContact.name.firstName} {props.selectedContact.name.lastName}
+                    {langCntx.langGetSet[0]==="eng" ?
+                            <span>{props.selectedContact.name.firstName} {props.selectedContact.name.lastName}</span>
+                            :
+                            <span>{props.selectedContact.name.lastName} {props.selectedContact.name.firstName}</span>
+                    }
                 </h1>
-                <p className="small">({props.selectedContact.id})</p>
                 <div className={(props.selectedContact.phones.length ? "" : "collapse")}>
-                    <h5>Phones</h5>
+                    <h5 className="my-3">{langCntx.dict[langCntx.langGetSet[0]].phones}</h5>
                     <ul className="list-group">
                         {props.selectedContact.phones.map((phone, i) =>
                             <li key={i} className="list-group-item">
@@ -245,7 +279,7 @@ export function SingleContact(props){
                     </ul>
                 </div>
                 <div className={(props.selectedContact.webs.length ? "" : "collapse")}>
-                    <h5>Webs &amp; emails</h5>
+                    <h5 className="my-3">{langCntx.dict[langCntx.langGetSet[0]].emails}</h5>
                     <ul className="list-group">
                         {props.selectedContact.webs.map((web, i) =>
                             <li key={i} className="list-group-item">
@@ -255,7 +289,7 @@ export function SingleContact(props){
                     </ul>
                 </div>
                 <div className={(props.selectedContact.address ? "" : "collapse")}>
-                    <h5>Address</h5>
+                    <h5 className="my-3">{langCntx.dict[langCntx.langGetSet[0]].address}</h5>
                     <div className="list-group">
                         <div className="list-group-item">
                             {props.selectedContact.address}

@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react";
-import {ContactList, AddContact, SingleContact} from "./ContactRequests";
+import {useEffect, useState, Fragment} from "react";
+import {ContactList, AddContact, SingleContact, AddContactButton} from "./ContactRequests";
 import axios from "axios";
 
 export function MainPage() {
@@ -21,15 +21,28 @@ export function MainPage() {
 
     return (
         <div className="container">
-            {changeHappened}
             <div className="row">
                 <div className="col-md">
-                    <ContactList contacts={contacts} setSelectedContact={setSelectedContact} selectedContact={selectedContact}/>
-                    <div className="d-flex justify-content-center border shadow-sm p-3 mb-4 mt-4 rounded bg-light">
-                        <button type="button" className="btn btn-dark" onClick={() => setCreating(true)}>
-                            Add a new contact
-                        </button>
-                    </div>
+                    {creating ?
+                        <div style={{pointerEvents: "none", opacity: 0.5}}>
+                            <ContactList
+                                contacts={contacts}
+                                setSelectedContact={setSelectedContact}
+                                selectedContact={selectedContact}
+                            />
+                        </div>
+                        :
+                        <Fragment>
+                            <ContactList
+                                contacts={contacts}
+                                setSelectedContact={setSelectedContact}
+                                selectedContact={selectedContact}
+                            />
+                            <AddContactButton
+                                setCreating={setCreating}
+                            />
+                        </Fragment>
+                    }
                 </div>
                 <div className="col-md">
                     {creating ?
