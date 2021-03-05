@@ -3,21 +3,45 @@ import {Modal} from "./Modal";
 import {LangContext} from "../App";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight, faArrowUp, faArrowDown} from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faArrowLeft, faArrowRight, faArrowUp, faArrowDown, faPlus, faMinus} from "@fortawesome/free-solid-svg-icons";
 
 export function ContactList(props){
     const langCntx = React.useContext(LangContext);
 
+    const [finder, setFinder] = useState("");
+
+    const handleChangeFinder = event => {
+        setFinder(event.target.value);
+    }
+
+    function filterFunction(searched){
+        if(langCntx.langGetSet[0]==="eng"){
+            return (searched.name.firstName+" "+searched.name.lastName).toLowerCase().includes(finder.toLowerCase());
+        }
+        return (searched.name.lastName+" "+searched.name.firstName).toLowerCase().includes(finder.toLowerCase());
+    }
+
     return (
         <Fragment>
         <div id="VerticalContactList" className="border shadow p-3 mb-4 mt-4 rounded">
-            <h3>{langCntx.dict[langCntx.langGetSet[0]].contacts}</h3>
+            <div className="row">
+                <h3 className="col">{langCntx.dict[langCntx.langGetSet[0]].contacts}</h3>
+                <div className="col m-2">
+                    <FontAwesomeIcon icon={faSearch}/>
+                    <input type="text" className="form-control"
+                        placeholder={langCntx.dict[langCntx.langGetSet[0]].typeAName}
+                        onChange={handleChangeFinder}
+                    />
+                </div>
+            </div>
             <ul className="list-group" id="ContactList">
                 <li className="list-group-item bg-secondary text-white text-center mb-1"
                     style={{cursor: "pointer"}}>
                     <FontAwesomeIcon icon={faArrowUp}/>
                 </li>
-                {props.contacts.map(contact =>
+                {props.contacts
+                .filter(searched => filterFunction(searched))
+                .map(contact =>
                     <li key={contact.id} className={"list-group-item border" + (contact===props.selectedContact ? " bg-dark text-white" : "")}
                         style={{cursor: "pointer"}} onClick={() => {props.setSelectedContact(contact);}}
                     >
@@ -36,12 +60,21 @@ export function ContactList(props){
         </div>
         <div id="HorizontalContactList" className="border shadow p-3 mb-4 mt-4 rounded">
             <h3>{langCntx.dict[langCntx.langGetSet[0]].contacts}</h3>
+            <div className="col m-2">
+                <FontAwesomeIcon icon={faSearch}/>
+                <input type="text" className="form-control"
+                    placeholder={langCntx.dict[langCntx.langGetSet[0]].typeAName}
+                    onChange={handleChangeFinder}
+                />
+            </div>
             <div className="row">
                 <Fragment>
                     <button className="btn btn-sm btn-secondary mr-1 ml-3">
                         <FontAwesomeIcon icon={faArrowLeft}/>
                     </button>
-                    {props.contacts.map(contact =>
+                    {props.contacts
+                    .filter(searched => filterFunction(searched))
+                    .map(contact =>
                         <div key={contact.id} className={"col border rounded text-center" + (contact===props.selectedContact ? " bg-dark text-white" : "")}
                             style={{cursor: "pointer"}} onClick={() => {props.setSelectedContact(contact);}}
                         >
@@ -155,7 +188,7 @@ export function AddContact(props){
                                             }
                                         }
                                     >
-                                        Trash
+                                        <FontAwesomeIcon icon={faMinus}/>
                                     </button>
                                 </div>
                             </div>
@@ -167,7 +200,7 @@ export function AddContact(props){
                                         setPhoneIds((prev) => [...prev, uuidv4()]);
                                     }}
                                 >
-                                    Plus
+                                    <FontAwesomeIcon icon={faPlus}/>
                                 </button>
                             </div>
                         </div>
@@ -181,6 +214,9 @@ export function AddContact(props){
                                 <div className="col-9">
                                     <input type="text" name={"web-" + i}
                                         className="form-control" placeholder="e-mail or website" required
+                                        pattern=
+                                        "^(((\w+)([\w-]*)(\.)?)*(\w+)(@[\w-]{2,20})\.([a-z]{2,6}))|(((https?):\/\/)?(www\.)?([\w]+-)*[\w]*\.([a-z]{2,6}))$"
+                                        size="35"
                                     />
                                 </div>
                                 <div className="col-3">
@@ -194,7 +230,7 @@ export function AddContact(props){
                                             }
                                         }
                                     >
-                                        Trash
+                                        <FontAwesomeIcon icon={faMinus}/>
                                     </button>
                                 </div>
                             </div>
@@ -206,7 +242,7 @@ export function AddContact(props){
                                         setEmailIds((prev) => [...prev, uuidv4()]);
                                     }}
                                 >
-                                    Plus
+                                    <FontAwesomeIcon icon={faPlus}/>
                                 </button>
                             </div>
                         </div>
@@ -214,7 +250,9 @@ export function AddContact(props){
                 </div>
                 <div className="form-row">
                     <label>{langCntx.dict[langCntx.langGetSet[0]].address}:</label>
-                    <input type="text" className="form-control" name="address" placeholder="address" onChange={handleChangeAddress}/>
+                    <input type="text" className="form-control" name="address"
+                        placeholder={langCntx.dict[langCntx.langGetSet[0]].address} onChange={handleChangeAddress}
+                    />
                 </div>
             </div>
             <div className="d-flex justify-content-center border shadow-sm p-3 mb-4 mt-4 rounded bg-light">
@@ -299,10 +337,10 @@ export function SingleContact(props){
             </div>
             <div className="d-flex justify-content-center border shadow-sm p-3 mb-4 mt-4 rounded bg-light">
                 <button className="btn btn-danger mr-2" onClick={() => {setDeleting(true);}}>
-                    Trash
+                    {langCntx.dict[langCntx.langGetSet[0]].delete}
                 </button>
                 <button className="btn btn-dark">
-                    (Pencil)
+                    {langCntx.dict[langCntx.langGetSet[0]].edit}
                 </button>
             </div>
         </Fragment>
