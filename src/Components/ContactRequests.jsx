@@ -23,7 +23,11 @@ export function ContactList(props){
         return (searched.name.lastName+" "+searched.name.firstName).toLowerCase().includes(finder.toLowerCase());
     }
 
-    const searchedNames = props.contacts.filter(searched => filterBySearch(searched));
+    const orderByLastName = (a, b) => (a.name.lastName > b.name.lastName ? 1 : -1);
+
+    const searchedNames = props.contacts
+        .filter(searched => filterBySearch(searched))
+        .sort(orderByLastName);
 
     function filterByPagination(i, range){
         return (i >= firstListItem && i < (firstListItem+range));
@@ -55,13 +59,13 @@ export function ContactList(props){
                         style={{cursor: "pointer"}} onClick={() => {props.setSelectedContact(contact);}}
                     >
                         {langCntx.langGetSet[0]==="eng" ?
-                            <span>{contact.name.firstName} {contact.name.lastName}</span>
+                            <span>{contact.name.firstName} <strong>{contact.name.lastName}</strong></span>
                             :
-                            <span>{contact.name.lastName} {contact.name.firstName}</span>
+                            <span><strong>{contact.name.lastName}</strong> {contact.name.firstName}</span>
                         }
                     </li>    
                 )}
-                <li className={"list-group-item text-white text-center mb-1" + (firstListItem>=searchedNames.length-5 ? " disabled bg-light" : " bg-secondary")}
+                <li className={"list-group-item text-white text-center mt-1" + (firstListItem>=searchedNames.length-5 ? " disabled bg-light" : " bg-secondary")}
                     style={{cursor: "pointer"}} onClick={() => setFirstListItem(prev => (prev + 1))}
                 >
                     <FontAwesomeIcon icon={faArrowDown}/>
@@ -94,9 +98,9 @@ export function ContactList(props){
                             style={{cursor: "pointer"}} onClick={() => {props.setSelectedContact(contact);}}
                         >
                         {langCntx.langGetSet[0]==="eng" ?
-                            <span>{contact.name.firstName[0]}. {contact.name.lastName[0]}.</span>
+                            <span>{contact.name.firstName[0]}. <strong>{contact.name.lastName[0]}.</strong></span>
                             :
-                            <span>{contact.name.lastName[0]}. {contact.name.firstName[0]}.</span>
+                            <span><strong>{contact.name.lastName[0]}.</strong> {contact.name.firstName[0]}.</span>
                         }
                         </div>    
                     )}
