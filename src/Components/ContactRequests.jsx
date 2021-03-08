@@ -174,6 +174,7 @@ export function AddContact(props){
                         <label>{langCntx.dict[langCntx.langGetSet[0]].firstName}:</label>
                         <input type="text" className="form-control" name="firstName"
                             placeholder={langCntx.dict[langCntx.langGetSet[0]].firstNameExample}
+                            pattern="^[A-ZÀ-Ý][a-zà-ÿ]{2,}(\s[A-ZÀ-Ý][a-zà-ÿ]{2,})?$"
                             onChange={handleChangeFirst} required
                         />
                     </div>
@@ -181,6 +182,7 @@ export function AddContact(props){
                         <label>{langCntx.dict[langCntx.langGetSet[0]].lastName}:</label>
                         <input type="text" className="form-control" name="lastName"
                             placeholder={langCntx.dict[langCntx.langGetSet[0]].lastNameExample}
+                            pattern="^([A-Z]?[a-z]{1,3}\.\s)?[A-ZÀ-Ý][a-zà-ÿ]{2,}(-[A-ZÀ-Ý][a-zà-ÿ]{2,})?$"
                             onChange={handleChangeLast} required
                         />
                     </div>            
@@ -196,7 +198,9 @@ export function AddContact(props){
                                 </select>
                                 <div className="col-6">
                                     <input type="text" name={"phone-number-" + i}
-                                        className="form-control" placeholder="0670/..." required
+                                        className="form-control" placeholder="+3670..." required
+                                        pattern="^(\+\d{1,3})?\s?(\(\d{1,4}\))?(\d{1,2}\/)?[\d\s\.\-]{5,12}$"
+                                        maxLength="16"
                                     />
                                 </div>
                                 <div className="col-3">
@@ -238,7 +242,7 @@ export function AddContact(props){
                                         className="form-control" placeholder="e-mail or website" required
                                         pattern=
                                         "^(((\w+)([\w-]*)(\.)?)*(\w+)(@[\w-]{2,20})\.([a-z]{2,6}))|(((https?):\/\/)?(www\.)?([\w]+-)*[\w]*\.([a-z]{2,6}))$"
-                                        size="35"
+                                        maxLength="35"
                                     />
                                 </div>
                                 <div className="col-3">
@@ -272,7 +276,7 @@ export function AddContact(props){
                 </div>
                 <div className="form-row">
                     <label>{langCntx.dict[langCntx.langGetSet[0]].address}:</label>
-                    <input type="text" className="form-control" name="address"
+                    <input type="text" className="form-control" name="address" maxLength="65"
                         placeholder={langCntx.dict[langCntx.langGetSet[0]].address} onChange={handleChangeAddress}
                     />
                 </div>
