@@ -1,5 +1,8 @@
 import {useEffect, useState, Fragment} from "react";
-import {ContactList, SingleContact, AddContactButton, AddContact, EditContact} from "./ContactRequests";
+import {AddContactButton, AddContact} from "./AddContact";
+import {ContactList} from "./ContactList";
+import {SingleContact} from "./SingleContact";
+import {EditContact} from "./EditContact";
 import axios from "axios";
 
 export function MainPage() {
