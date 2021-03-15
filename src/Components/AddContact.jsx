@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {uuidv4, prepareEmails, preparePhones} from "./Accessories";
+import {uuidv4, prepareWebs, preparePhones} from "./Accessories";
 import {LangContext} from "../App";
 import axios from "axios";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -20,7 +20,7 @@ export function AddContactButton(props){
 export function AddContact(props){
     const langCntx = React.useContext(LangContext);
 
-    const [emailIds, setEmailIds] = useState([]);
+    const [webIds, setWebIds] = useState([]);
     const [phoneIds, setPhoneIds] = useState([]);
 
     const handleSubmit = async event => {
@@ -32,7 +32,7 @@ export function AddContact(props){
                 lastName: event.target.elements.lastName.value
             },
             phones: preparePhones(event.target.elements),
-            webs: prepareEmails(event.target.elements),
+            webs: prepareWebs(event.target.elements),
             address: event.target.elements.address.value
         }
         await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/contacts`, contact);
@@ -107,11 +107,15 @@ export function AddContact(props){
                 </div>
                 <div className="form-row">
                     <div className="form-group">
-                        <label>{langCntx.dict[langCntx.langGetSet[0]].emails}</label>
-                        {emailIds.map((emailId, i) => (
-                            <div key={emailId} className="row m-2">
-                                <div className="col-9">
-                                    <input type="text" name={"web-" + i}
+                        <label>{langCntx.dict[langCntx.langGetSet[0]].webs}</label>
+                        {webIds.map((webId, i) => (
+                            <div key={webId} className="row m-2">
+                                <select className="form-control col-3" name={"web-type-" + i}>
+                                    <option value="site">{langCntx.dict[langCntx.langGetSet[0]].site}</option>
+                                    <option value="email">{langCntx.dict[langCntx.langGetSet[0]].email}</option>
+                                </select>
+                                <div className="col-6">
+                                    <input type="text" name={"web-name-" + i}
                                         className="form-control" placeholder="e-mail or website" required
                                         pattern=
                                         "^(((\w+)([\w-]*)(\.)?)*(\w+)(@[\w-]{2,20})\.([a-z]{2,6}))|(((https?):\/\/)?(www\.)?([\w]+-)*[\w]*\.([a-z]{2,6}))$"
@@ -121,7 +125,7 @@ export function AddContact(props){
                                 <div className="col-3">
                                     <button className="btn btn-danger btn-sm" type="button"
                                         onClick={() => {
-                                            setEmailIds((prevIds) => {
+                                            setWebIds((prevIds) => {
                                                 const ret = [...prevIds];
                                                 ret.splice(i, 1);
                                                 return ret;
@@ -138,7 +142,7 @@ export function AddContact(props){
                             <div className="col-3 offset-9">
                                 <button type="button" className="btn btn-secondary btn-sm"
                                     onClick={() => {
-                                        setEmailIds((prev) => [...prev, uuidv4()]);
+                                        setWebIds((prev) => [...prev, uuidv4()]);
                                     }}
                                 >
                                     <FontAwesomeIcon icon={faPlus}/>

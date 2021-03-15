@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {uuidv4, prepareEmails, preparePhones} from "./Accessories";
+import {uuidv4, prepareWebs, preparePhones} from "./Accessories";
 import {LangContext} from "../App";
 import axios from "axios";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -8,11 +8,11 @@ import {faPlus, faMinus} from "@fortawesome/free-solid-svg-icons";
 export function EditContact(props){
     const langCntx = React.useContext(LangContext);
 
-    const [emails, setEmails] = useState([]);
+    const [webs, setWebs] = useState([]);
     const [phones, setPhones] = useState([]);
 
     useEffect(() => {
-        setEmails(props.selectedContact.webs.map((email) => [uuidv4(), email]));
+        setWebs(props.selectedContact.webs.map((web) => [uuidv4(), web]));
     }, []);
 
     useEffect(() => {
@@ -28,7 +28,7 @@ export function EditContact(props){
                 lastName: event.target.elements.lastName.value
             },
             phones: preparePhones(event.target.elements),
-            webs: prepareEmails(event.target.elements),
+            webs: prepareWebs(event.target.elements),
             address: event.target.elements.address.value
         }
         await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/contacts/${props.selectedContact.id}`, contact);
@@ -106,12 +106,16 @@ export function EditContact(props){
                 </div>
                 <div className="form-row">
                     <div className="form-group">
-                        <label>{langCntx.dict[langCntx.langGetSet[0]].emails}</label>
-                        {emails.map(([emailId, email], i) => (
-                            <div key={emailId} className="row m-2">
-                                <div className="col-9">
-                                    <input type="text" name={"web-" + i}
-                                        className="form-control" defaultValue={email}
+                        <label>{langCntx.dict[langCntx.langGetSet[0]].webs}</label>
+                        {webs.map(([webId, web], i) => (
+                            <div key={webId} className="row m-2">
+                                <select className="form-control col-3" name={"web-type-" + i} defaultValue={web.type}>
+                                    <option value="site">{langCntx.dict[langCntx.langGetSet[0]].site}</option>
+                                    <option value="email">{langCntx.dict[langCntx.langGetSet[0]].email}</option>
+                                </select>
+                                <div className="col-6">
+                                    <input type="text" name={"web-name-" + i}
+                                        className="form-control" defaultValue={web.name}
                                         placeholder="e-mail or website" required
                                         pattern=
                                         "^(((\w+)([\w-]*)(\.)?)*(\w+)(@[\w-]{2,20})\.([a-z]{2,6}))|(((https?):\/\/)?(www\.)?([\w]+-)*[\w]*\.([a-z]{2,6}))$"
@@ -121,7 +125,7 @@ export function EditContact(props){
                                 <div className="col-3">
                                     <button className="btn btn-danger btn-sm" type="button"
                                         onClick={() => {
-                                            setEmails((prevs) => {
+                                            setWebs((prevs) => {
                                                 const ret = [...prevs];
                                                 ret.splice(i, 1);
                                                 return ret;
@@ -138,7 +142,7 @@ export function EditContact(props){
                             <div className="col-3 offset-9">
                                 <button type="button" className="btn btn-secondary btn-sm"
                                     onClick={() => {
-                                        setEmails((prev) => [...prev, [uuidv4(), ""]]);
+                                        setWebs((prev) => [...prev, [uuidv4(), {type:"", name:""}]]);
                                     }}
                                 >
                                     <FontAwesomeIcon icon={faPlus}/>

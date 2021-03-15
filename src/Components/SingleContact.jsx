@@ -55,11 +55,11 @@ export function SingleContact(props){
                     </ul>
                 </div>
                 <div className={(props.selectedContact.webs.length ? "" : "collapse")}>
-                    <h5 className="my-3">{langCntx.dict[langCntx.langGetSet[0]].emails}</h5>
+                    <h5 className="my-3">{langCntx.dict[langCntx.langGetSet[0]].webs}</h5>
                     <ul className="list-group">
                         {props.selectedContact.webs.map((web, i) =>
                             <li key={i} className="list-group-item">
-                                {web}
+                                {web.name} <span className="small">({web.type})</span>
                             </li>
                         )}
                     </ul>

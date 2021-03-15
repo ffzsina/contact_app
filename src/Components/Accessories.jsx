@@ -7,7 +7,7 @@ export function uuidv4() {
     });
 }
 
-export function prepareEmails(elements) {
+export function prepareEmails_old(elements) {
     return Object.values(
         Object.entries(elements)
         .filter(([key, value]) => {
@@ -19,6 +19,25 @@ export function prepareEmails(elements) {
         .map(([key, value]) => (
             value.value
         ))
+    );
+}
+
+export function prepareWebs(elements) {
+    return Object.values(
+        Object.entries(elements)
+        .filter(([key, value]) => {
+            if (value.name){ 
+                const [dataType] = value.name.split("-");
+                return dataType === "web";
+            } else {return false;}
+        })
+        .reduce((acc, [key, value]) => {
+            const [_, name, index] = value.name.split("-");
+            return {
+                ...acc,
+                [index]: {...acc[index], [name]: value.value}
+            };
+        }, {})
     );
 }
 
@@ -34,14 +53,9 @@ export function preparePhones(elements) {
         .reduce((acc, [key, value]) => {
             const [_, name, index] = value.name.split("-");
             return {
-              ...acc,
-              [index]: acc[index]
-                ? {
-                    ...acc[index],
-                    [name]: value.value,
-                  }
-                : { [name]: value.value },
+                ...acc,
+                [index]: {...acc[index], [name]: value.value}
             };
-          }, {})
+        }, {})
     );
 }
