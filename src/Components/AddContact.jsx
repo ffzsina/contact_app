@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {uuidv4, prepareWebs, preparePhones} from "./Accessories";
+import {uuidv4, prepare} from "./Accessories";
 import {LangContext} from "../App";
 import axios from "axios";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -31,8 +31,8 @@ export function AddContact(props){
                 firstName: event.target.elements.firstName.value,
                 lastName: event.target.elements.lastName.value
             },
-            phones: preparePhones(event.target.elements),
-            webs: prepareWebs(event.target.elements),
+            phones: prepare("phone", event.target.elements),
+            webs: prepare("web", event.target.elements),
             address: event.target.elements.address.value
         }
         await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/contacts`, contact);
