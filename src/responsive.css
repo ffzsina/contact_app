@@ -15,6 +15,6 @@ img {
 }
 
 #WithBackgroundImage {
-    background-image: url("http://localhost:8080/static/images/red_phone.jpg");
+    background-image: url("http://fruzsinascontactapp.ddns.net/static/images/red_phone.jpg");
     background-size: cover;
 }

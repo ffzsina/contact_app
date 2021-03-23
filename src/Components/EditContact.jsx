@@ -1,23 +1,41 @@
-import React, {useState, useEffect} from "react";
+import React, {useReducer} from "react";
 import {uuidv4, prepare} from "./Accessories";
 import {LangContext} from "../App";
 import axios from "axios";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus, faMinus} from "@fortawesome/free-solid-svg-icons";
 
+function webReducer(webState, action){
+    switch (action.type){
+        case 'minus':
+            const ret = [...webState];
+            ret.splice(action.payload.i, 1);
+            return ret;
+        case 'plus':
+            return [...webState, [uuidv4(), {type:"", name:""}]];
+        default:
+            return webState;
+    }
+}
+
+function phoneReducer(phoneState, action){
+    switch (action.type){
+        case 'minus':
+            const ret = [...phoneState];
+            ret.splice(action.payload.i, 1);
+            return ret;
+        case 'plus':
+            return [...phoneState, [uuidv4(), {type:"", number:""}]];
+        default:
+            return phoneState;
+    }
+}
+
 export function EditContact(props){
     const langCntx = React.useContext(LangContext);
 
-    const [webs, setWebs] = useState([]);
-    const [phones, setPhones] = useState([]);
-
-    useEffect(() => {
-        setWebs(props.selectedContact.webs.map((web) => [uuidv4(), web]));
-    }, []);
-
-    useEffect(() => {
-        setPhones(props.selectedContact.phones.map((phone) => [uuidv4(), phone]));
-    }, []);
+    const [webState, webDispatch] = useReducer(webReducer, props.selectedContact.webs.map((web) => [uuidv4(), web]));
+    const [phoneState, phoneDispatch] = useReducer(phoneReducer, props.selectedContact.phones.map((phone) => [uuidv4(), phone]));
 
     const handleSubmit = async event => {
         event.preventDefault();
@@ -35,7 +53,7 @@ export function EditContact(props){
         props.setChangeHappened(true);
         props.setWorking("idle");
     };
-
+    
     return (
         <form onSubmit={handleSubmit}>
             <div id="WithBackgroundImage" className="border shadow p-3 mb-4 mt-4 rounded">
@@ -61,7 +79,7 @@ export function EditContact(props){
                 <div className="form-row">
                     <div className="form-group">
                         <label>{langCntx.dict[langCntx.langGetSet[0]].phones}:</label>
-                        {phones.map(([phoneId, phone], i) => (
+                        {phoneState.map(([phoneId, phone], i) => (
                             <div key={phoneId} className="row m-2">
                                 <select className="form-control col-3" name={"phone-type-" + i} defaultValue={phone.type}>
                                     <option value="private">{langCntx.dict[langCntx.langGetSet[0]].private}</option>
@@ -78,13 +96,8 @@ export function EditContact(props){
                                 <div className="col-3">
                                     <button className="btn btn-danger btn-sm" type="button"
                                         onClick={() => {
-                                            setPhones((prevs) => {
-                                                const ret = [...prevs];
-                                                ret.splice(i, 1);
-                                                return ret;
-                                                });
-                                            }
-                                        }
+                                            phoneDispatch({type: 'minus', payload: {index: i} });
+                                        }}
                                     >
                                         <FontAwesomeIcon icon={faMinus}/>
                                     </button>
@@ -95,7 +108,7 @@ export function EditContact(props){
                             <div className="col-3 offset-9">
                                 <button type="button" className="btn btn-secondary btn-sm"
                                     onClick={() => {
-                                        setPhones((prev) => [...prev, [uuidv4(), {type:"", number:""}]]);
+                                        phoneDispatch({type: 'plus'});
                                     }}
                                 >
                                     <FontAwesomeIcon icon={faPlus}/>
@@ -107,7 +120,7 @@ export function EditContact(props){
                 <div className="form-row">
                     <div className="form-group">
                         <label>{langCntx.dict[langCntx.langGetSet[0]].webs}</label>
-                        {webs.map(([webId, web], i) => (
+                        {webState.map(([webId, web], i) => (
                             <div key={webId} className="row m-2">
                                 <select className="form-control col-3" name={"web-type-" + i} defaultValue={web.type}>
                                     <option value="site">{langCntx.dict[langCntx.langGetSet[0]].site}</option>
@@ -125,13 +138,8 @@ export function EditContact(props){
                                 <div className="col-3">
                                     <button className="btn btn-danger btn-sm" type="button"
                                         onClick={() => {
-                                            setWebs((prevs) => {
-                                                const ret = [...prevs];
-                                                ret.splice(i, 1);
-                                                return ret;
-                                                });
-                                            }
-                                        }
+                                            webDispatch({type: 'minus', payload: {index: i} });
+                                        }}
                                     >
                                         <FontAwesomeIcon icon={faMinus}/>
                                     </button>
@@ -142,7 +150,7 @@ export function EditContact(props){
                             <div className="col-3 offset-9">
                                 <button type="button" className="btn btn-secondary btn-sm"
                                     onClick={() => {
-                                        setWebs((prev) => [...prev, [uuidv4(), {type:"", name:""}]]);
+                                        webDispatch({type: 'plus'});
                                     }}
                                 >
                                     <FontAwesomeIcon icon={faPlus}/>
